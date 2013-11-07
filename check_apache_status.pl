@@ -13,7 +13,7 @@ getopts( "H:v:w:c:", \%options );
     'bytes_per_request'   => 'LiB',
     'accesses'            => 'LiB',
     'bytes_per_second'    => 'LiB',
-    'idle_worker'         => 'HiB',
+    'idle_workers'         => 'HiB',
     #'uptime'                => 'LiB',
     'current_requests' => 'LiB'
 );
@@ -23,7 +23,7 @@ getopts( "H:v:w:c:", \%options );
     'bytes_per_request'   => '1024',
     'accesses'            => '100000',
     'bytes_per_second'    => '1000',
-    'idle_worker'         => '50',
+    'idle_workers'         => '50',
     'current_requests'    => '150'
 );
 %warning = (
@@ -32,7 +32,7 @@ getopts( "H:v:w:c:", \%options );
     'bytes_per_request'   => '768',
     'accesses'            => '50000',
     'bytes_per_second'    => '800',
-    'idle_worker'         => '150',
+    'idle_workers'         => '150',
     'current_requests'    => '70'
 );
 my @pretext
@@ -98,7 +98,7 @@ sub help() {
                 bytes_per_request LiB
                 accesses    LiB
                 bytes_per_second  LiB
-                idle_worker   HiB
+                idle_workers   HiB
                 current_requests  LiB
     uptime      [will allways deliver UNKNOWN]
 
@@ -226,7 +226,7 @@ sub get_apache_status($) {
             )
         {
             $results{'current_requests'} = $1;
-            $results{'idle_worker'}      = $2;
+            $results{'idle_workers'}      = $2;
         }
     }
     return (%results);
