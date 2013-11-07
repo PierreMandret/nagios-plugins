@@ -1,4 +1,3 @@
-
 #!/usr/bin/perl
 
 use Getopt::Std;
@@ -15,7 +14,6 @@ getopts( "H:v:w:c:", \%options );
     'accesses'            => 'LiB',
     'bytes_per_second'    => 'LiB',
     'idle_worker'         => 'HiB',
-
     #'uptime'                => 'LiB',
     'current_requests' => 'LiB'
 );
