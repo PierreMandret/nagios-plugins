@@ -1,3 +1,4 @@
+
 #!/usr/bin/perl
 
 use Getopt::Std;
@@ -215,28 +216,28 @@ sub get_apache_status($) {
             }
         }
         elsif ( $line
-            =~ /([\d\.]+) requests\/sec - ([\d\.]+) ([MKGB]+)\/second - ([\d\.]+) ([MKGB]+)\/request/
+            =~ /([\d\.]+) requests\/sec - ([\d\.]+) ([MkGB]+)\/second - ([\d\.]+) ([MkGB]+)\/request/
             )
         {
             $results{'requests_per_second'} = $1;
             given ($3) {
                 when ('/^G/') { $results{'bytes_per_second'} = $2 / 1024; }
                 when ('/^M/') { $results{'bytes_per_second'} = $2; }
-                when ('/^K/') { $results{'bytes_per_second'} = $2 * 1024; }
+                when ('/^k/') { $results{'bytes_per_second'} = $2 * 1024; }
                 when ('/^B/') {
                     $results{'bytes_per_second'} = $2 * ( 1024 * 2 );
                 }
                 default { $results{'bytes_per_second'} = $2; }
             }
 
-            given ($4) {
-                when ('/^G/') { $results{'bytes_per_request'} = $3 / 1024; }
-                when ('/^M/') { $results{'bytes_per_request'} = $3; }
-                when ('/^K/') { $results{'bytes_per_request'} = $3 * 1024; }
+            given ($5) {
+                when ('/^G/') { $results{'bytes_per_request'} = $4 / 1024; }
+                when ('/^M/') { $results{'bytes_per_request'} = $4; }
+                when ('/^k/') { $results{'bytes_per_request'} = $4 * 1024; }
                 when ('/^B/') {
-                    $results{'bytes_per_request'} = $3 * ( 1024 * 2 );
+                    $results{'bytes_per_request'} = $4 * ( 1024 * 2 );
                 }
-                default { $results{'bytes_per_request'} = $3; }
+                default { $results{'bytes_per_request'} = $4; }
             }
 
         }
