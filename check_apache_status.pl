@@ -13,7 +13,8 @@ getopts( "H:v:w:c:", \%options );
     'bytes_per_request'   => 'LiB',
     'accesses'            => 'LiB',
     'bytes_per_second'    => 'LiB',
-    'idle_workers'         => 'HiB',
+    'idle_workers'        => 'HiB',
+
     #'uptime'                => 'LiB',
     'current_requests' => 'LiB'
 );
@@ -23,7 +24,7 @@ getopts( "H:v:w:c:", \%options );
     'bytes_per_request'   => '1024',
     'accesses'            => '100000',
     'bytes_per_second'    => '1000',
-    'idle_workers'         => '50',
+    'idle_workers'        => '50',
     'current_requests'    => '150'
 );
 %warning = (
@@ -32,7 +33,7 @@ getopts( "H:v:w:c:", \%options );
     'bytes_per_request'   => '768',
     'accesses'            => '50000',
     'bytes_per_second'    => '800',
-    'idle_workers'         => '150',
+    'idle_workers'        => '150',
     'current_requests'    => '70'
 );
 my @pretext
@@ -209,24 +210,42 @@ sub get_apache_status($) {
                 when ('/^G/') { $results{'traffic'} = $2 / 1024; }
                 when ('/^M/') { $results{'traffic'} = $2; }
                 when ('/^K/') { $results{'traffic'} = $2 * 1024; }
-                when ('/^B/') { $results{'traffic'} = $2 * (1024*2); }
+                when ('/^B/') { $results{'traffic'} = $2 * ( 1024 * 2 ); }
                 default       { $results{'traffic'} = $2; }
             }
         }
         elsif ( $line
-            =~ /([\d\.]+) requests\/sec - ([\d\.]+) B\/second - ([\d\.]+) B\/request/
+            =~ /([\d\.]+) requests\/sec - ([\d\.]+) ([MKGB]+)\/second - ([\d\.]+) ([MKGB]+)\/request/
             )
         {
             $results{'requests_per_second'} = $1;
-            $results{'bytes_per_second'}    = $2;
-            $results{'bytes_per_request'}   = $3;
+            given ($3) {
+                when ('/^G/') { $results{'bytes_per_second'} = $2 / 1024; }
+                when ('/^M/') { $results{'bytes_per_second'} = $2; }
+                when ('/^K/') { $results{'bytes_per_second'} = $2 * 1024; }
+                when ('/^B/') {
+                    $results{'bytes_per_second'} = $2 * ( 1024 * 2 );
+                }
+                default { $results{'bytes_per_second'} = $2; }
+            }
+
+            given ($4) {
+                when ('/^G/') { $results{'bytes_per_request'} = $3 / 1024; }
+                when ('/^M/') { $results{'bytes_per_request'} = $3; }
+                when ('/^K/') { $results{'bytes_per_request'} = $3 * 1024; }
+                when ('/^B/') {
+                    $results{'bytes_per_request'} = $3 * ( 1024 * 2 );
+                }
+                default { $results{'bytes_per_request'} = $3; }
+            }
+
         }
         elsif ( $line
             =~ /(\d+) requests currently being processed, (\d+) idle workers/
             )
         {
             $results{'current_requests'} = $1;
-            $results{'idle_workers'}      = $2;
+            $results{'idle_workers'}     = $2;
         }
     }
     return (%results);
