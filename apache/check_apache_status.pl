@@ -4,7 +4,7 @@ use Getopt::Std;
 use 5.010;
 
 my %options = ();
-getopts( "H:v:w:c:", \%options );
+getopts( "H:v:w:c:t:", \%options );
 
 ### CONFIGURATION
 %monitor_type = (
@@ -43,10 +43,12 @@ my $mon    = $options{'v'};
 
 $warning{$mon}  = $options{'w'} if ( $options{'w'} );
 $critical{$mon} = $options{'c'} if ( $options{'c'} );
+$timeout        = $options{'t'} if ( $options{'t'} );
+print $timeout;
 
 help() if ( !$options{'H'} );
 
-my %data = get_apache_status($server);
+my %data = get_apache_status( $server, $timeout );
 if ( !keys(%data) ) {
     print $pretext[3] . ": $server did not deliver information.\n";
     exit(3);
@@ -91,7 +93,7 @@ sub help() {
   check_apache_status
   Fetches the server-status page of an apache, extracts some information and evaluates them.
   
-  usage: check_apache_status -H HOSTNAME -v VARNAME [-c LIMIT] [-w LIMIT]
+  usage: check_apache_status -H HOSTNAME -v VARNAME [-t TIMEOUT] [-c LIMIT] [-w LIMIT]
 
   VARNAME might be one of:
     traffic     provided in MB
@@ -101,7 +103,6 @@ sub help() {
                 bytes_per_second  LiB
                 idle_workers   HiB
                 current_requests  LiB
-    uptime      [will allways deliver UNKNOWN]
 
   HiB = Higher is Better
   LiB = Lower is Better
@@ -157,16 +158,22 @@ sub CheckValue($\%) {
 }
 
 sub get_apache_status($) {
+
     use LWP::UserAgent;
     use URI::URL;
 
-    my $uri = shift() || return ();
+    my $uri     = shift() || return ();
+    my $timeout = shift() || 15;
     $uri = 'http://' . $uri . '/server-status';
     my $hdrs = new HTTP::Headers(
         Accept     => 'text/plain',
         User-Agent => 'STAMPBrowser/1.0'
     );
-    my $ua   = new LWP::UserAgent;
+    my $ua = new LWP::UserAgent(
+        protocols_allowed => ['http'],
+        timeout           => $timeout
+    );
+    print $timeout;
     my $url  = new URI::URL($uri);
     my $req  = new HTTP::Request( GET, $url, $hdrs );
     my $resp = $ua->request($req);
@@ -219,6 +226,7 @@ sub get_apache_status($) {
             )
         {
             $results{'requests_per_second'} = $1;
+
             given ($3) {
                 when ('/^G/') { $results{'bytes_per_second'} = $2 / 1024; }
                 when ('/^M/') { $results{'bytes_per_second'} = $2; }
