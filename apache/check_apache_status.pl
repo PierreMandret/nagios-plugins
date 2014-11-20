@@ -44,7 +44,7 @@ my $mon    = $options{'v'};
 $warning{$mon}  = $options{'w'} if ( $options{'w'} );
 $critical{$mon} = $options{'c'} if ( $options{'c'} );
 $timeout        = $options{'t'} if ( $options{'t'} );
-print $timeout;
+#print $timeout;
 
 help() if ( !$options{'H'} );
 
@@ -92,7 +92,7 @@ sub help() {
     print <<HERE;
   check_apache_status
   Fetches the server-status page of an apache, extracts some information and evaluates them.
-  
+
   usage: check_apache_status -H HOSTNAME -v VARNAME [-t TIMEOUT] [-c LIMIT] [-w LIMIT]
 
   VARNAME might be one of:
@@ -173,7 +173,7 @@ sub get_apache_status($) {
         protocols_allowed => ['http'],
         timeout           => $timeout
     );
-    print $timeout;
+    #print $timeout;
     my $url  = new URI::URL($uri);
     my $req  = new HTTP::Request( GET, $url, $hdrs );
     my $resp = $ua->request($req);
