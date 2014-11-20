@@ -214,11 +214,11 @@ sub get_apache_status($) {
             $results{'traffic'}  = $2;
 
             given ($3) {
-                when ('/^G/') { $results{'traffic'} = $2 / 1024; }
-                when ('/^M/') { $results{'traffic'} = $2; }
-                when ('/^K/') { $results{'traffic'} = $2 * 1024; }
-                when ('/^B/') { $results{'traffic'} = $2 * ( 1024 * 2 ); }
-                default       { $results{'traffic'} = $2; }
+                when ('/^G/') { $results{'traffic'} = $2 / 1024 . ' MB'; }
+                when ('/^M/') { $results{'traffic'} = $2 . ' MB'; }
+                when ('/^K/') { $results{'traffic'} = $2 * 1024 . ' MB'; }
+                when ('/^B/') { $results{'traffic'} = $2 * ( 1024 * 2 ) . ' MB'; }
+                default       { $results{'traffic'} = $2 . ' MB'; }
             }
         }
         elsif ( $line
